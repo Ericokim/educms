@@ -1,4 +1,5 @@
 import { LogOut } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -17,6 +18,7 @@ import { useAuth } from '@/features/auth/auth-context'
 
 export function AppHeader() {
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
 
   if (!user) return null
 
@@ -31,6 +33,10 @@ export function AppHeader() {
 
   async function handleLogout() {
     await logout()
+    // Land on a clean login page: without this, ProtectedRoute records the
+    // current page as the return path and the NEXT user to sign in gets sent
+    // there - an access-denied page if their role can't view it.
+    navigate('/login', { replace: true })
     toast.success('Logged out')
   }
 
