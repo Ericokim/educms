@@ -24,8 +24,9 @@ export default defineConfig([
   },
   {
     // shadcn/ui components export variants (e.g. buttonVariants) alongside
-    // the component, which is incompatible with this fast-refresh rule.
-    files: ['src/components/ui/**/*.tsx'],
+    // the component, and the router exports lazy() route components next to
+    // the router object - neither participates in fast refresh.
+    files: ['src/components/ui/**/*.tsx', 'src/app/router.tsx'],
     rules: {
       'react-refresh/only-export-components': 'off',
     },

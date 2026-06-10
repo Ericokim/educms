@@ -150,6 +150,44 @@ export async function getPostBySlug(slug: string): Promise<PostDetail | null> {
   return result.rows[0] ? toDetail(result.rows[0]) : null
 }
 
+/** Lightweight row for permission checks and status validation - no joins. */
+export interface PostMeta {
+  id: number
+  title: string
+  slug: string
+  status: PostStatus
+  authorId: number
+  categoryId: number | null
+  featuredImageId: number | null
+}
+
+export async function getPostMeta(id: number): Promise<PostMeta | null> {
+  const result = await pool.query<{
+    id: number
+    title: string
+    slug: string
+    status: PostStatus
+    author_id: number
+    category_id: number | null
+    featured_image_id: number | null
+  }>(
+    `SELECT id, title, slug, status, author_id, category_id, featured_image_id
+     FROM posts WHERE id = $1`,
+    [id]
+  )
+  const row = result.rows[0]
+  if (!row) return null
+  return {
+    id: row.id,
+    title: row.title,
+    slug: row.slug,
+    status: row.status,
+    authorId: row.author_id,
+    categoryId: row.category_id,
+    featuredImageId: row.featured_image_id,
+  }
+}
+
 export async function slugExists(slug: string, excludeId?: number): Promise<boolean> {
   const result = excludeId
     ? await pool.query('SELECT 1 FROM posts WHERE slug = $1 AND id <> $2', [slug, excludeId])

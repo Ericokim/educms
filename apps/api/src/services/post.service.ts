@@ -164,7 +164,7 @@ export async function updatePost(
 }
 
 export async function publishPost(user: User, id: number): Promise<PostDetail> {
-  const existing = await posts.getPostById(id)
+  const existing = await posts.getPostMeta(id)
   if (!existing) throw notFound('Post not found')
   assertCanAccess(user, existing)
 
@@ -176,7 +176,7 @@ export async function publishPost(user: User, id: number): Promise<PostDetail> {
 }
 
 export async function archivePost(user: User, id: number): Promise<PostDetail> {
-  const existing = await posts.getPostById(id)
+  const existing = await posts.getPostMeta(id)
   if (!existing) throw notFound('Post not found')
   assertCanAccess(user, existing)
 
@@ -188,7 +188,7 @@ export async function archivePost(user: User, id: number): Promise<PostDetail> {
 }
 
 export async function deletePost(user: User, id: number): Promise<void> {
-  const existing = await posts.getPostById(id)
+  const existing = await posts.getPostMeta(id)
   if (!existing) throw notFound('Post not found')
   assertCanAccess(user, existing)
 
@@ -200,7 +200,7 @@ export async function listPostVersions(
   user: User,
   postId: number
 ): Promise<PostVersionSummary[]> {
-  const post = await posts.getPostById(postId)
+  const post = await posts.getPostMeta(postId)
   if (!post) throw notFound('Post not found')
   assertCanAccess(user, post)
   return posts.listVersions(postId)
@@ -211,7 +211,7 @@ export async function rollbackPost(
   postId: number,
   versionId: number
 ): Promise<PostDetail> {
-  const post = await posts.getPostById(postId)
+  const post = await posts.getPostMeta(postId)
   if (!post) throw notFound('Post not found')
   assertCanAccess(user, post)
 

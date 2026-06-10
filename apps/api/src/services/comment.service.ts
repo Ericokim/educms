@@ -9,7 +9,7 @@ import type {
 import { COMMENT_STATUSES, POST_STATUSES } from '@educms/shared'
 import { logActivity } from '../repositories/activityLog.repository.js'
 import * as comments from '../repositories/comment.repository.js'
-import { getPostById } from '../repositories/post.repository.js'
+import { getPostMeta } from '../repositories/post.repository.js'
 import { badRequest, notFound } from '../utils/httpError.js'
 
 export function listComments(query: ListCommentsQuery): Promise<Paginated<CommentItem>> {
@@ -20,7 +20,7 @@ export async function createComment(
   user: User,
   values: CreateCommentValues
 ): Promise<CommentItem> {
-  const post = await getPostById(values.postId)
+  const post = await getPostMeta(values.postId)
   if (!post) throw notFound('Post not found')
   if (post.status !== POST_STATUSES.PUBLISHED) {
     throw badRequest('Comments are only allowed on published posts')

@@ -1,19 +1,38 @@
+import { lazy } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import { ROLES, STAFF_ROLES } from '@educms/shared'
-import { AnalyticsPage } from '@/features/analytics/AnalyticsPage'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
 import { RequireRole } from '@/features/auth/RequireRole'
-import { CommentsPage } from '@/features/comments/CommentsPage'
 import { DashboardPage } from '@/features/dashboard/DashboardPage'
-import { MediaPage } from '@/features/media/MediaPage'
-import { PostEditorPage } from '@/features/posts/PostEditorPage'
-import { PostsPage } from '@/features/posts/PostsPage'
-import { CategoriesPage } from '@/features/taxonomy/CategoriesPage'
-import { TagsPage } from '@/features/taxonomy/TagsPage'
-import { UsersPage } from '@/features/users/UsersPage'
 import { AppLayout } from './layout/AppLayout'
 
+// Heavy feature pages are split into their own chunks; the post editor
+// (TipTap) and analytics (recharts) carry the largest dependencies.
+const PostsPage = lazy(() =>
+  import('@/features/posts/PostsPage').then((m) => ({ default: m.PostsPage }))
+)
+const PostEditorPage = lazy(() =>
+  import('@/features/posts/PostEditorPage').then((m) => ({ default: m.PostEditorPage }))
+)
+const CategoriesPage = lazy(() =>
+  import('@/features/taxonomy/CategoriesPage').then((m) => ({ default: m.CategoriesPage }))
+)
+const TagsPage = lazy(() =>
+  import('@/features/taxonomy/TagsPage').then((m) => ({ default: m.TagsPage }))
+)
+const CommentsPage = lazy(() =>
+  import('@/features/comments/CommentsPage').then((m) => ({ default: m.CommentsPage }))
+)
+const MediaPage = lazy(() =>
+  import('@/features/media/MediaPage').then((m) => ({ default: m.MediaPage }))
+)
+const UsersPage = lazy(() =>
+  import('@/features/users/UsersPage').then((m) => ({ default: m.UsersPage }))
+)
+const AnalyticsPage = lazy(() =>
+  import('@/features/analytics/AnalyticsPage').then((m) => ({ default: m.AnalyticsPage }))
+)
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
