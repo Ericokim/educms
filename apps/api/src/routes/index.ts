@@ -6,6 +6,7 @@ import { healthRoutes } from './health.routes.js'
 import { mediaRoutes } from './media.routes.js'
 import { postRoutes } from './post.routes.js'
 import { categoryRoutes, tagRoutes } from './taxonomy.routes.js'
+import { userRoutes } from './user.routes.js'
 
 export const apiRoutes = Router()
 
@@ -17,7 +18,5 @@ apiRoutes.use('/categories', categoryRoutes)
 apiRoutes.use('/tags', tagRoutes)
 apiRoutes.use('/comments', commentRoutes)
 apiRoutes.use('/media', mediaRoutes)
-
-// Mounted in later phases:
-// apiRoutes.use('/users', userRoutes)
+apiRoutes.use('/users', userRoutes)
 // apiRoutes.use('/analytics', analyticsRoutes)
