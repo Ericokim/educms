@@ -5,5 +5,6 @@ export default tseslint.config(
   { ignores: ['dist'] },
   js.configs.recommended,
   tseslint.configs.recommended,
-  { files: ['src/**/*.ts'] }
+  { files: ['src/**/*.ts'] },
+  { languageOptions: { parserOptions: { tsconfigRootDir: import.meta.dirname } } }
 )
