@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { analyticsRoutes } from './analytics.routes.js'
 import { authRoutes } from './auth.routes.js'
+import { commentRoutes } from './comment.routes.js'
 import { healthRoutes } from './health.routes.js'
 import { postRoutes } from './post.routes.js'
 import { categoryRoutes, tagRoutes } from './taxonomy.routes.js'
@@ -13,9 +14,9 @@ apiRoutes.use('/analytics', analyticsRoutes)
 apiRoutes.use('/posts', postRoutes)
 apiRoutes.use('/categories', categoryRoutes)
 apiRoutes.use('/tags', tagRoutes)
+apiRoutes.use('/comments', commentRoutes)
 
 // Mounted in later phases:
 // apiRoutes.use('/users', userRoutes)
-// apiRoutes.use('/comments', commentRoutes)
 // apiRoutes.use('/media', mediaRoutes)
 // apiRoutes.use('/analytics', analyticsRoutes)

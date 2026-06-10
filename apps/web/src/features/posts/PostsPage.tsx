@@ -81,6 +81,11 @@ export function PostsPage() {
 
   const pagination = posts.data?.pagination
 
+  // Clamp the page when deletions empty the last page of results.
+  if (pagination && pagination.totalPages > 0 && page > pagination.totalPages) {
+    setPage(pagination.totalPages)
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">

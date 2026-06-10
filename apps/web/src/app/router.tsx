@@ -4,6 +4,7 @@ import { ComingSoon } from '@/components/shared/ComingSoon'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
 import { RequireRole } from '@/features/auth/RequireRole'
+import { CommentsPage } from '@/features/comments/CommentsPage'
 import { DashboardPage } from '@/features/dashboard/DashboardPage'
 import { PostEditorPage } from '@/features/posts/PostEditorPage'
 import { PostsPage } from '@/features/posts/PostsPage'
@@ -65,7 +66,7 @@ export const router = createBrowserRouter([
             path: '/comments',
             element: (
               <RequireRole roles={[ROLES.ADMIN, ROLES.EDITOR]}>
-                <ComingSoon title="Comments" phase="Phase 8" />
+                <CommentsPage />
               </RequireRole>
             ),
           },
