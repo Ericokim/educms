@@ -1,55 +1,22 @@
+import compression from 'compression'
+import cors from 'cors'
 import express from 'express'
-import type { ApiError, ApiSuccess } from '@educms/shared'
+import helmet from 'helmet'
 import { env } from './config/env.js'
-import { checkDatabaseConnection } from './database/pool.js'
+import { errorHandler, notFoundHandler } from './middleware/errorHandler.js'
+import { apiRateLimiter } from './middleware/rateLimiter.js'
+import { requestLogger } from './middleware/requestLogger.js'
+import { apiRoutes } from './routes/index.js'
 
 export const app = express()
 
-app.use(express.json())
+app.use(requestLogger)
+app.use(helmet())
+app.use(cors({ origin: env.frontendUrl, credentials: true }))
+app.use(compression())
+app.use(express.json({ limit: '1mb' }))
 
-app.get('/api/health', (_req, res) => {
-  const body: ApiSuccess<{
-    status: string
-    environment: string
-    uptime: number
-    timestamp: string
-  }> = {
-    success: true,
-    message: 'API is healthy',
-    data: {
-      status: 'ok',
-      environment: env.nodeEnv,
-      uptime: process.uptime(),
-      timestamp: new Date().toISOString(),
-    },
-  }
-  res.json(body)
-})
+app.use('/api', apiRateLimiter, apiRoutes)
 
-app.get('/api/health/db', async (_req, res) => {
-  const connected = await checkDatabaseConnection()
-  if (!connected) {
-    const body: ApiError = {
-      success: false,
-      message: 'Database is not reachable',
-      errors: [],
-    }
-    res.status(503).json(body)
-    return
-  }
-  const body: ApiSuccess<{ database: string }> = {
-    success: true,
-    message: 'Database is healthy',
-    data: { database: 'connected' },
-  }
-  res.json(body)
-})
-
-app.use((_req, res) => {
-  const body: ApiError = {
-    success: false,
-    message: 'Resource not found',
-    errors: [],
-  }
-  res.status(404).json(body)
-})
+app.use(notFoundHandler)
+app.use(errorHandler)

@@ -17,14 +17,23 @@
   "dependencies": {
     "@educms/shared": "*",
     "bcryptjs": "^3.0.3",
+    "compression": "^1.8.1",
+    "cors": "^2.8.6",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0",
+    "morgan": "^1.11.0",
     "node-pg-migrate": "^8.0.4",
-    "pg": "^8.21.0"
+    "pg": "^8.21.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
+    "@types/compression": "^1.8.1",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.2",
+    "@types/morgan": "^1.9.10",
     "@types/node": "^20.17.50",
     "@types/pg": "^8.20.0",
     "@types/supertest": "^6.0.3",

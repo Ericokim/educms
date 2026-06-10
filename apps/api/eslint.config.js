@@ -5,5 +5,13 @@ export default tseslint.config(
   { ignores: ['dist'] },
   js.configs.recommended,
   tseslint.configs.recommended,
-  { files: ['src/**/*.ts'] }
+  { files: ['src/**/*.ts'] },
+  {
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+    },
+  }
 )
