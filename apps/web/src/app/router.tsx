@@ -7,6 +7,8 @@ import { RequireRole } from '@/features/auth/RequireRole'
 import { DashboardPage } from '@/features/dashboard/DashboardPage'
 import { PostEditorPage } from '@/features/posts/PostEditorPage'
 import { PostsPage } from '@/features/posts/PostsPage'
+import { CategoriesPage } from '@/features/taxonomy/CategoriesPage'
+import { TagsPage } from '@/features/taxonomy/TagsPage'
 import { AppLayout } from './layout/AppLayout'
 
 
@@ -47,7 +49,7 @@ export const router = createBrowserRouter([
             path: '/categories',
             element: (
               <RequireRole roles={[ROLES.ADMIN]}>
-                <ComingSoon title="Categories" phase="Phase 7" />
+                <CategoriesPage />
               </RequireRole>
             ),
           },
@@ -55,7 +57,7 @@ export const router = createBrowserRouter([
             path: '/tags',
             element: (
               <RequireRole roles={[ROLES.ADMIN]}>
-                <ComingSoon title="Tags" phase="Phase 7" />
+                <TagsPage />
               </RequireRole>
             ),
           },
