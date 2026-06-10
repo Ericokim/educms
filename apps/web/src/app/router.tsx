@@ -5,6 +5,8 @@ import { LoginPage } from '@/features/auth/LoginPage'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
 import { RequireRole } from '@/features/auth/RequireRole'
 import { DashboardPage } from '@/features/dashboard/DashboardPage'
+import { PostEditorPage } from '@/features/posts/PostEditorPage'
+import { PostsPage } from '@/features/posts/PostsPage'
 import { AppLayout } from './layout/AppLayout'
 
 
@@ -21,7 +23,23 @@ export const router = createBrowserRouter([
             path: '/posts',
             element: (
               <RequireRole roles={STAFF_ROLES}>
-                <ComingSoon title="Posts" phase="Phase 6" />
+                <PostsPage />
+              </RequireRole>
+            ),
+          },
+          {
+            path: '/posts/new',
+            element: (
+              <RequireRole roles={STAFF_ROLES}>
+                <PostEditorPage />
+              </RequireRole>
+            ),
+          },
+          {
+            path: '/posts/:id/edit',
+            element: (
+              <RequireRole roles={STAFF_ROLES}>
+                <PostEditorPage />
               </RequireRole>
             ),
           },

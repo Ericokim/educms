@@ -23,16 +23,8 @@ import { ErrorState } from '@/components/shared/ErrorState'
 import { StatCard } from '@/components/shared/StatCard'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { useAuth } from '@/features/auth/auth-context'
+import { formatDateTime } from '@/lib/format'
 import { useDashboard } from './useDashboard'
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 
 function describeActivity(entry: ActivityEntry): string {
   const who = entry.username ?? 'Someone'
@@ -176,7 +168,7 @@ export function DashboardPage() {
                     <div className="min-w-0">
                       <p className="truncate font-medium">{post.title}</p>
                       <p className="text-xs text-muted-foreground">
-                        {post.author} · {formatDate(post.updatedAt)}
+                        {post.author} · {formatDateTime(post.updatedAt)}
                       </p>
                     </div>
                     <StatusBadge status={post.status} />
@@ -205,7 +197,7 @@ export function DashboardPage() {
                     <li key={comment.id} className="py-2.5">
                       <p className="line-clamp-2 text-sm">“{comment.excerpt}”</p>
                       <p className="mt-0.5 text-xs text-muted-foreground">
-                        {comment.author} on {comment.postTitle} · {formatDate(comment.createdAt)}
+                        {comment.author} on {comment.postTitle} · {formatDateTime(comment.createdAt)}
                       </p>
                     </li>
                   ))}
@@ -230,7 +222,7 @@ export function DashboardPage() {
                     <li key={entry.id} className="flex items-baseline justify-between gap-3 text-sm">
                       <span className="min-w-0 truncate">{describeActivity(entry)}</span>
                       <span className="shrink-0 text-xs text-muted-foreground">
-                        {formatDate(entry.createdAt)}
+                        {formatDateTime(entry.createdAt)}
                       </span>
                     </li>
                   ))}

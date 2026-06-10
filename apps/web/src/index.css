@@ -117,6 +117,43 @@
     --sidebar-ring: oklch(0.556 0 0);
 }
 
+.tiptap-content h2 {
+    margin: 0.75em 0 0.4em;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.tiptap-content h3 {
+    margin: 0.65em 0 0.35em;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.tiptap-content p {
+    margin: 0.35em 0;
+}
+
+.tiptap-content ul,
+.tiptap-content ol {
+    margin: 0.4em 0;
+    padding-left: 1.4em;
+}
+
+.tiptap-content ul {
+    list-style: disc;
+}
+
+.tiptap-content ol {
+    list-style: decimal;
+}
+
+.tiptap-content blockquote {
+    margin: 0.5em 0;
+    border-left: 3px solid var(--border);
+    padding-left: 0.9em;
+    color: var(--muted-foreground);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

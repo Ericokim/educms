@@ -43,6 +43,12 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return body.data
 }
 
+export function getApiErrorMessage(error: unknown): string {
+  return error instanceof ApiClientError
+    ? error.message
+    : 'Something went wrong. Please try again.'
+}
+
 export const api = {
   get: <T>(path: string) => request<T>(path),
   post: <T>(path: string, data?: unknown) =>
