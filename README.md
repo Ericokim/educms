@@ -46,6 +46,30 @@ cp apps/web/.env.example apps/web/.env
 
 Edit `apps/api/.env` and set at minimum `DATABASE_URL` and `JWT_SECRET`. Never commit `.env` files.
 
+## Database
+
+You need a running PostgreSQL server. Either use a local install, or start one with Docker:
+
+```bash
+docker compose up -d postgres
+```
+
+If using a local install, create the role and database to match `.env`:
+
+```bash
+psql -d template1 -c "CREATE ROLE educms LOGIN PASSWORD 'educms'"
+createdb -O educms educms
+```
+
+Then apply the schema and development seed data:
+
+```bash
+npm run migrate -w apps/api
+npm run seed -w apps/api
+```
+
+Seed users: `admin`, `editor`, `author`, `author2`, `subscriber` — password `Password123!`. See [docs/database.md](docs/database.md) for the full schema.
+
 ## Running the App
 
 In two terminals:

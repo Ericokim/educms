@@ -7,18 +7,26 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
-    "lint": "eslint src",
-    "test": "vitest run"
+    "lint": "eslint src migrations",
+    "test": "vitest run",
+    "migrate": "node-pg-migrate up",
+    "migrate:down": "node-pg-migrate down",
+    "migrate:create": "node-pg-migrate create",
+    "seed": "tsx src/database/seed.ts"
   },
   "dependencies": {
     "@educms/shared": "*",
+    "bcryptjs": "^3.0.3",
     "dotenv": "^16.5.0",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "node-pg-migrate": "^8.0.4",
+    "pg": "^8.21.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
     "@types/express": "^5.0.2",
     "@types/node": "^20.17.50",
+    "@types/pg": "^8.20.0",
     "@types/supertest": "^6.0.3",
     "eslint": "^9.28.0",
     "supertest": "^7.1.1",

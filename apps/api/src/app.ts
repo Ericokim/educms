@@ -1,6 +1,7 @@
 import express from 'express'
 import type { ApiError, ApiSuccess } from '@educms/shared'
 import { env } from './config/env.js'
+import { checkDatabaseConnection } from './database/pool.js'
 
 export const app = express()
 
@@ -21,6 +22,25 @@ app.get('/api/health', (_req, res) => {
       uptime: process.uptime(),
       timestamp: new Date().toISOString(),
     },
+  }
+  res.json(body)
+})
+
+app.get('/api/health/db', async (_req, res) => {
+  const connected = await checkDatabaseConnection()
+  if (!connected) {
+    const body: ApiError = {
+      success: false,
+      message: 'Database is not reachable',
+      errors: [],
+    }
+    res.status(503).json(body)
+    return
+  }
+  const body: ApiSuccess<{ database: string }> = {
+    success: true,
+    message: 'Database is healthy',
+    data: { database: 'connected' },
   }
   res.json(body)
 })
