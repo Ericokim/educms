@@ -27,6 +27,7 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { ErrorState } from '@/components/shared/ErrorState'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { useAuth } from '@/features/auth/auth-context'
+import { FeaturedImagePicker } from '@/features/media/FeaturedImagePicker'
 import { cn } from '@/lib/utils'
 import { RichTextEditor } from './RichTextEditor'
 import { VersionHistoryDialog } from './VersionHistoryDialog'
@@ -47,6 +48,7 @@ const EMPTY_FORM: PostFormValues = {
   excerpt: '',
   content: '',
   categoryId: null,
+  featuredImageId: null,
   tagIds: [],
   metaTitle: '',
   metaDescription: '',
@@ -60,6 +62,7 @@ function formValuesFromPost(post: PostDetail): PostFormValues {
     excerpt: post.excerpt ?? '',
     content: post.content,
     categoryId: post.categoryId,
+    featuredImageId: post.featuredImageId,
     tagIds: post.tags.map((tag) => tag.id),
     metaTitle: post.metaTitle ?? '',
     metaDescription: post.metaDescription ?? '',
@@ -313,6 +316,17 @@ export function PostEditorPage() {
                         )
                       })}
                     </div>
+                  )}
+                />
+              </Field>
+
+              <Field>
+                <FieldLabel>Featured image</FieldLabel>
+                <Controller
+                  control={control}
+                  name="featuredImageId"
+                  render={({ field }) => (
+                    <FeaturedImagePicker value={field.value} onChange={field.onChange} />
                   )}
                 />
               </Field>

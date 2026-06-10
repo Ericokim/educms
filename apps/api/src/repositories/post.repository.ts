@@ -163,6 +163,7 @@ export interface PostWriteData {
   excerpt: string | null
   content: string
   categoryId: number | null
+  featuredImageId: number | null
   metaTitle: string | null
   metaDescription: string | null
   metaKeywords: string | null
@@ -175,9 +176,9 @@ export async function insertPost(
 ): Promise<number> {
   const result = await db.query<{ id: number }>(
     `INSERT INTO posts
-       (title, slug, excerpt, content, author_id, category_id,
+       (title, slug, excerpt, content, author_id, category_id, featured_image_id,
         meta_title, meta_description, meta_keywords)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      RETURNING id`,
     [
       data.title,
@@ -186,6 +187,7 @@ export async function insertPost(
       data.content,
       authorId,
       data.categoryId,
+      data.featuredImageId,
       data.metaTitle,
       data.metaDescription,
       data.metaKeywords,
@@ -202,7 +204,8 @@ export async function updatePostRow(
   await db.query(
     `UPDATE posts SET
        title = $2, slug = $3, excerpt = $4, content = $5, category_id = $6,
-       meta_title = $7, meta_description = $8, meta_keywords = $9, updated_at = now()
+       featured_image_id = $7, meta_title = $8, meta_description = $9,
+       meta_keywords = $10, updated_at = now()
      WHERE id = $1`,
     [
       id,
@@ -211,6 +214,7 @@ export async function updatePostRow(
       data.excerpt,
       data.content,
       data.categoryId,
+      data.featuredImageId,
       data.metaTitle,
       data.metaDescription,
       data.metaKeywords,

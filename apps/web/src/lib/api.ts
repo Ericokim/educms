@@ -18,7 +18,9 @@ export class ApiClientError extends Error {
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getToken()
   const headers: HeadersInit = {
-    ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+    // FormData bodies must NOT get a Content-Type: the browser sets the
+    // multipart boundary itself.
+    ...(typeof options.body === 'string' ? { 'Content-Type': 'application/json' } : {}),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   }
@@ -56,4 +58,14 @@ export const api = {
   patch: <T>(path: string, data?: unknown) =>
     request<T>(path, { method: 'PATCH', body: data === undefined ? undefined : JSON.stringify(data) }),
   delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
+  /** Multipart upload; the browser sets the Content-Type boundary itself. */
+  upload: <T>(path: string, formData: FormData) =>
+    request<T>(path, { method: 'POST', body: formData }),
+}
+
+/** Origin serving uploaded files (the API host without the /api suffix). */
+export const API_ORIGIN = API_URL.replace(/\/api\/?$/, '')
+
+export function mediaUrl(path: string): string {
+  return `${API_ORIGIN}${path}`
 }

@@ -15,6 +15,8 @@ export const env = {
   databaseUrl:
     process.env.DATABASE_URL || 'postgresql://educms:educms@localhost:5432/educms',
   bcryptRounds: Number(process.env.BCRYPT_ROUNDS) || 10,
+  uploadDir: process.env.UPLOAD_DIR || 'uploads',
+  maxFileSize: Number(process.env.MAX_FILE_SIZE) || 5 * 1024 * 1024,
 }
 
 export const isProduction = env.nodeEnv === 'production'

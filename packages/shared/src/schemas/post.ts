@@ -13,6 +13,7 @@ export const postFormSchema = z.object({
   excerpt: z.string().trim().max(500).optional().or(z.literal('')),
   content: z.string().min(1, 'Content is required'),
   categoryId: z.number().int().positive().nullable().optional(),
+  featuredImageId: z.number().int().positive().nullable().optional(),
   tagIds: z.array(z.number().int().positive()).max(20).default([]),
   metaTitle: z.string().trim().max(255).optional().or(z.literal('')),
   metaDescription: z.string().trim().max(500).optional().or(z.literal('')),

@@ -1,4 +1,5 @@
 import type { ErrorRequestHandler, RequestHandler } from 'express'
+import multer from 'multer'
 import { ZodError } from 'zod'
 import { isProduction } from '../config/env.js'
 import { HttpError } from '../utils/httpError.js'
@@ -24,6 +25,28 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
         message: issue.message,
       }))
     )
+    return
+  }
+
+  // Postgres constraint violations from invalid client references are the
+  // client's fault, not a server failure.
+  if (err && typeof err === 'object' && 'code' in err) {
+    if (err.code === '23503') {
+      sendError(res, 'A referenced resource does not exist', 400)
+      return
+    }
+    if (err.code === '23505') {
+      sendError(res, 'A resource with these details already exists', 409)
+      return
+    }
+  }
+
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      sendError(res, 'The file is too large', 413)
+      return
+    }
+    sendError(res, `Upload failed: ${err.message}`, 400)
     return
   }
 

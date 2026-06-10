@@ -6,6 +6,7 @@ import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
 import { RequireRole } from '@/features/auth/RequireRole'
 import { CommentsPage } from '@/features/comments/CommentsPage'
 import { DashboardPage } from '@/features/dashboard/DashboardPage'
+import { MediaPage } from '@/features/media/MediaPage'
 import { PostEditorPage } from '@/features/posts/PostEditorPage'
 import { PostsPage } from '@/features/posts/PostsPage'
 import { CategoriesPage } from '@/features/taxonomy/CategoriesPage'
@@ -74,7 +75,7 @@ export const router = createBrowserRouter([
             path: '/media',
             element: (
               <RequireRole roles={STAFF_ROLES}>
-                <ComingSoon title="Media" phase="Phase 9" />
+                <MediaPage />
               </RequireRole>
             ),
           },
