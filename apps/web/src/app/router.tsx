@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { ROLES, STAFF_ROLES } from '@educms/shared'
-import { ComingSoon } from '@/components/shared/ComingSoon'
+import { AnalyticsPage } from '@/features/analytics/AnalyticsPage'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
 import { RequireRole } from '@/features/auth/RequireRole'
@@ -92,7 +92,7 @@ export const router = createBrowserRouter([
             path: '/analytics',
             element: (
               <RequireRole roles={[ROLES.ADMIN, ROLES.EDITOR]}>
-                <ComingSoon title="Analytics" phase="Phase 11" />
+                <AnalyticsPage />
               </RequireRole>
             ),
           },

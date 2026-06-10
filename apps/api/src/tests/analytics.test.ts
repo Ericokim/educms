@@ -49,3 +49,52 @@ describe('GET /api/analytics/dashboard', () => {
     expect(res.status).toBe(403)
   })
 })
+
+describe('detailed analytics', () => {
+  it('returns post analytics with top content, categories, months, and comments', async () => {
+    const token = await loginAs(ADMIN)
+    const res = await request(app)
+      .get('/api/analytics/posts')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(200)
+    const { topPosts, byCategory, postsPerMonth, commentsByStatus } = res.body.data
+    expect(topPosts.length).toBeGreaterThan(0)
+    expect(topPosts[0].viewCount).toBeGreaterThanOrEqual(
+      topPosts[topPosts.length - 1].viewCount
+    )
+    expect(byCategory.length).toBeGreaterThan(0)
+    expect(byCategory[0]).toHaveProperty('totalViews')
+    expect(Array.isArray(postsPerMonth)).toBe(true)
+    expect(commentsByStatus.length).toBeGreaterThan(0)
+  })
+
+  it('returns user analytics with roles and author performance', async () => {
+    const token = await loginAs(ADMIN)
+    const res = await request(app)
+      .get('/api/analytics/users')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(200)
+    const { byRole, authorPerformance } = res.body.data
+    expect(byRole.length).toBeGreaterThan(0)
+    expect(authorPerformance.length).toBeGreaterThan(0)
+    expect(authorPerformance[0]).toHaveProperty('publishedCount')
+  })
+
+  it('forbids authors from the detailed analytics endpoints', async () => {
+    const login = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'author@educms.local', password: 'Password123!' })
+    const token = login.body.data.token
+
+    const posts = await request(app)
+      .get('/api/analytics/posts')
+      .set('Authorization', `Bearer ${token}`)
+    expect(posts.status).toBe(403)
+    const users = await request(app)
+      .get('/api/analytics/users')
+      .set('Authorization', `Bearer ${token}`)
+    expect(users.status).toBe(403)
+  })
+})
