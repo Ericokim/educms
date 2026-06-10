@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { ROLES, createCommentSchema, listCommentsQuerySchema } from '@educms/shared'
 import * as commentController from '../controllers/comment.controller.js'
 import { authMiddleware, requireRole } from '../middleware/auth.js'
+import { commentRateLimiter } from '../middleware/rateLimiter.js'
 import { validateRequest } from '../middleware/validateRequest.js'
 
 const idParamsSchema = z.object({ id: z.coerce.number().int().positive() })
@@ -18,7 +19,12 @@ commentRoutes.get(
   commentController.list
 )
 // Any authenticated user (including subscribers) can comment on published posts.
-commentRoutes.post('/', validateRequest({ body: createCommentSchema }), commentController.create)
+commentRoutes.post(
+  '/',
+  commentRateLimiter,
+  validateRequest({ body: createCommentSchema }),
+  commentController.create
+)
 commentRoutes.patch(
   '/:id/approve',
   requireRole(...MODERATORS),

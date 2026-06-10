@@ -25,3 +25,16 @@ export const loginRateLimiter = createRateLimiter(
   20,
   'Too many login attempts, please try again later'
 )
+
+// Comments are the only write any authenticated user can perform; keep the
+// spam ceiling well below the general API limit.
+export const commentRateLimiter = createRateLimiter(
+  30,
+  'You are commenting too quickly, please wait a moment'
+)
+
+// Uploads are expensive; limit how many one client can push per window.
+export const uploadRateLimiter = createRateLimiter(
+  60,
+  'Too many uploads, please try again later'
+)

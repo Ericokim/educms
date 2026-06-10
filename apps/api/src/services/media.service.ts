@@ -11,6 +11,7 @@ import { ROLES } from '@educms/shared'
 import { uploadDir } from '../middleware/upload.js'
 import { logActivity } from '../repositories/activityLog.repository.js'
 import * as media from '../repositories/media.repository.js'
+import { fileMatchesMimeType } from '../utils/fileSignature.js'
 import { badRequest, forbidden, notFound } from '../utils/httpError.js'
 
 function assertCanManage(user: User, item: MediaItem): void {
@@ -29,6 +30,12 @@ export async function createMedia(
   file: Express.Multer.File | undefined
 ): Promise<MediaItem> {
   if (!file) throw badRequest('No file uploaded. Send the file in a "file" form field.')
+
+  // The Content-Type header is client-controlled; verify the actual bytes.
+  if (!(await fileMatchesMimeType(file.path, file.mimetype))) {
+    await fs.unlink(file.path).catch(() => {})
+    throw badRequest('The file content does not match its declared type')
+  }
 
   const id = await media.insertMedia({
     filename: file.filename,

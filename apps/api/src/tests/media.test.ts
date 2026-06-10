@@ -72,6 +72,20 @@ describe('media uploads', () => {
     expect(res.body.success).toBe(false)
   })
 
+  it('rejects files whose content does not match the declared type', async () => {
+    const token = await loginAs(AUTHOR)
+    const res = await request(app)
+      .post('/api/media/upload')
+      .set(auth(token))
+      .attach('file', Buffer.from('<?php system($_GET["c"]); ?>'), {
+        filename: 'innocent.png',
+        contentType: 'image/png',
+      })
+
+    expect(res.status).toBe(400)
+    expect(res.body.message).toBe('The file content does not match its declared type')
+  })
+
   it('rejects files over the size limit with 413', async () => {
     const token = await loginAs(AUTHOR)
     const big = Buffer.alloc(6 * 1024 * 1024, 1)

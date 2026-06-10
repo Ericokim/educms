@@ -11,6 +11,12 @@ import { apiRoutes } from './routes/index.js'
 
 export const app = express()
 
+// Behind a reverse proxy (Render/Railway/Fly), the client IP arrives in
+// X-Forwarded-For; rate limiting needs it to bucket per client.
+if (env.nodeEnv === 'production') {
+  app.set('trust proxy', 1)
+}
+
 app.use(requestLogger)
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }))
 app.use(cors({ origin: env.frontendUrl, credentials: true }))
