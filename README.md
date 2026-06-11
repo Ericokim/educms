@@ -2,7 +2,9 @@
 
 EduCMS is an educational Content Management System for institutions to manage posts, categories, tags, comments, media, users, SEO metadata, and analytics through a role-based admin panel.
 
-> Status: in development. See [projectplan.md](projectplan.md) for the build phases and current progress.
+**Features:** JWT auth with four roles (admin/editor/author/subscriber) · posts with rich text, SEO fields, versioning and rollback · publish/archive workflow · categories & tags · comment moderation · media library with validated uploads · user management with instant deactivation · dashboard & analytics with charts · 95 automated tests + browser QA suite.
+
+> Build history: [projectplan.md](projectplan.md) — all 16 phases complete.
 
 ## Tech Stack
 
@@ -68,7 +70,7 @@ npm run migrate -w apps/api
 npm run seed -w apps/api
 ```
 
-Seed users: `admin`, `editor`, `author`, `author2`, `subscriber` — password `Password123!`. See [docs/database.md](docs/database.md) for the full schema.
+Seed users: `admin@educms.local`, `editor@…`, `author@…`, `author2@…`, `subscriber@…` — password `Password123!`. See [docs/database.md](docs/database.md) for the full schema.
 
 ## Running the App
 
@@ -96,8 +98,19 @@ Root:
 | `npm run build` | Build shared package, API, and frontend |
 | `npm run lint` | Lint all workspaces |
 | `npm run test` | Run tests in all workspaces |
+| `npm run qa:browser` | Playwright browser QA (needs both dev servers running) |
 
-Per workspace (`-w apps/web`, `-w apps/api`, `-w packages/shared`): `lint`, `build`, and `test` (API) are available individually.
+Per workspace (`-w apps/web`, `-w apps/api`, `-w packages/shared`): `lint`, `build`, and `test` are available individually.
+
+## Testing
+
+```bash
+npm run test -w apps/api    # 73 integration tests (needs migrated + seeded local DB)
+npm run test -w apps/web    # 22 component tests
+npm run qa:browser          # 10-step browser walkthrough with screenshots
+```
+
+CI (`.github/workflows/ci.yml`) runs lint, build, migrations, and both test suites against a Postgres service container on every push.
 
 ## API Response Format
 
@@ -113,4 +126,12 @@ All API responses use a consistent envelope:
 
 ## Documentation
 
-Detailed docs (architecture, API reference, database schema, deployment guide, user manual) will be added under `docs/` as the corresponding phases are completed.
+| Doc | Contents |
+| --- | --- |
+| [docs/architecture.md](docs/architecture.md) | Monorepo layout, API layering, frontend structure, data flow |
+| [docs/api.md](docs/api.md) | Every endpoint with roles, payloads, and rate limits |
+| [docs/database.md](docs/database.md) | Schema, constraints, indexes, migrations, seed data |
+| [docs/deployment.md](docs/deployment.md) | Deploying frontend, API, and database + troubleshooting |
+| [docs/testing.md](docs/testing.md) | Test strategy, coverage, bugs found during QA |
+| [docs/user-manual.md](docs/user-manual.md) | End-user guide per role |
+| [docs/final-report.md](docs/final-report.md) | Project report |

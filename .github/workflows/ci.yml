@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: educms
+          POSTGRES_PASSWORD: educms
+          POSTGRES_DB: educms
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U educms -d educms"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://educms:educms@localhost:5432/educms
+      JWT_SECRET: ci-only-secret-not-for-production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies (builds @educms/shared via postinstall)
+        run: npm ci
+
+      - name: Lint all workspaces
+        run: npm run lint
+
+      - name: Build all workspaces
+        run: npm run build
+
+      - name: Run database migrations
+        run: npm run migrate -w apps/api
+
+      - name: Seed test data
+        run: npm run seed -w apps/api
+
+      - name: Backend tests
+        run: npm run test -w apps/api
+
+      - name: Frontend tests
+        run: npm run test -w apps/web
