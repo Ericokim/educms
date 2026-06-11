@@ -9,3 +9,9 @@ uploads/
 .DS_Store
 coverage/
 qa-screenshots/
+
+# Internal project files (kept locally, not published)
+.claude/
+CLAUDE.md
+projectplan.md
+docs/
