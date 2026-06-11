@@ -8,7 +8,7 @@ import { openApiDocument } from '../docs/openapi.js'
  */
 export const docsRoutes = Router()
 
-const scalarEnabled = process.env.SCALAR_ENABLED !== 'false'
+export const scalarEnabled = process.env.SCALAR_ENABLED !== 'false'
 
 if (scalarEnabled) {
   docsRoutes.get('/openapi.json', (_req, res) => {

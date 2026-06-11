@@ -33,6 +33,13 @@ describe('API documentation', () => {
     expect(paths['/auth/register']).toBeUndefined()
   })
 
+  it('redirects the API root to the docs', async () => {
+    const res = await request(app).get('/')
+
+    expect(res.status).toBe(302)
+    expect(res.headers.location).toBe('/api/docs')
+  })
+
   it('renders the Scalar docs page', async () => {
     const res = await request(app).get('/api/docs')
 

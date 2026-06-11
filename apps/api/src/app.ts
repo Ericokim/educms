@@ -7,6 +7,7 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler.js'
 import { apiRateLimiter } from './middleware/rateLimiter.js'
 import { requestLogger } from './middleware/requestLogger.js'
 import { uploadDir } from './middleware/upload.js'
+import { scalarEnabled } from './routes/docs.routes.js'
 import { apiRoutes } from './routes/index.js'
 
 export const app = express()
@@ -26,6 +27,11 @@ app.use(express.json({ limit: '1mb' }))
 app.use('/api', apiRateLimiter, apiRoutes)
 // Uploaded files; the frontend on another origin embeds these images.
 app.use('/uploads', express.static(uploadDir, { maxAge: '7d', index: false }))
+
+// Visiting the API origin directly lands on the interactive docs.
+if (scalarEnabled) {
+  app.get('/', (_req, res) => res.redirect('/api/docs'))
+}
 
 app.use(notFoundHandler)
 app.use(errorHandler)
