@@ -2,6 +2,22 @@
 
 EduCMS is an educational Content Management System for institutions to manage posts, categories, tags, comments, media, users, SEO metadata, and analytics through a role-based admin panel.
 
+## Live Demo
+
+- **Live app:** https://educms-sandy.vercel.app — public site at `/`, admin panel at [`/admin`](https://educms-sandy.vercel.app/admin)
+- **Repository:** https://github.com/Ericokim/educms
+
+**Demo accounts** (all use password `Password123!`):
+
+| Email | Role |
+| --- | --- |
+| admin@educms.local | Admin |
+| editor@educms.local | Editor |
+| author@educms.local | Author |
+| subscriber@educms.local | Subscriber |
+
+> The API runs on Render's free tier and sleeps when idle — the first request may take ~30 seconds to wake it. Uploaded files are ephemeral on the free tier.
+
 **Features:** a public content website (homepage, articles, categories, tags, search, comments) backed by a role-based admin panel · JWT auth with four roles (admin/editor/author/subscriber) · posts with rich text, SEO fields, versioning and rollback · draft → preview → publish workflow · comment moderation · media library with validated uploads · user management with instant deactivation · dashboard & analytics with charts · 106 automated tests + an end-to-end browser QA suite.
 
 **Two faces, one app:** the public site lives at `/` (only published content, ever), the admin CMS at `/admin`. Editors preview drafts through the exact public article layout before publishing.
@@ -135,6 +151,8 @@ The public site is served by a dedicated `/api/public` namespace that can only e
 
 ## Deployment
 
-- **Database** — any managed PostgreSQL (Neon, Supabase, Railway). Run `DATABASE_URL=... npm run migrate -w apps/api`.
-- **API** — Render/Railway/Fly. Build: `npm ci && npm run build -w apps/api`; start: `node apps/api/dist/server.js`; health check: `/api/health`. Required env: `NODE_ENV=production`, `DATABASE_URL`, `JWT_SECRET`, `FRONTEND_URL` (exact frontend origin, for CORS). Put `UPLOAD_DIR` on a persistent volume.
-- **Frontend** — Vercel/Netlify static. Build: `npm ci && npm run build -w apps/web`; output: `apps/web/dist`; env: `VITE_API_URL=https://<api-host>/api`; route all paths to `index.html` (SPA).
+The live demo runs on this stack:
+
+- **Frontend → Vercel** — configured by [`vercel.json`](vercel.json) (root-level monorepo build with SPA rewrites). Deploy with `vercel --prod`; set `VITE_API_URL=https://<api-host>/api`.
+- **API + PostgreSQL → Render** — configured by [`render.yaml`](render.yaml) (blueprint: Node web service with build-time migrations and a managed Postgres). Required env: `NODE_ENV=production`, `DATABASE_URL`, `JWT_SECRET`, `FRONTEND_URL` (exact frontend origin, for CORS). Use a persistent disk for `UPLOAD_DIR` on paid tiers.
+- Any equivalent hosts work (Netlify; Railway/Fly + Neon/Supabase) — same build commands, same env vars.
