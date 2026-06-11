@@ -22,14 +22,14 @@ const STAFF = STAFF_ROLES
 const EVERYONE: Role[] = [...STAFF, ROLES.SUBSCRIBER]
 
 export const NAV_ITEMS: NavItem[] = [
-  { label: 'Dashboard', to: '/', icon: LayoutDashboard, roles: EVERYONE },
-  { label: 'Posts', to: '/posts', icon: FileText, roles: STAFF },
-  { label: 'Categories', to: '/categories', icon: FolderTree, roles: [ROLES.ADMIN] },
-  { label: 'Tags', to: '/tags', icon: Tags, roles: [ROLES.ADMIN] },
-  { label: 'Comments', to: '/comments', icon: MessagesSquare, roles: [ROLES.ADMIN, ROLES.EDITOR] },
-  { label: 'Media', to: '/media', icon: Image, roles: STAFF },
-  { label: 'Users', to: '/users', icon: Users, roles: [ROLES.ADMIN] },
-  { label: 'Analytics', to: '/analytics', icon: BarChart3, roles: [ROLES.ADMIN, ROLES.EDITOR] },
+  { label: 'Dashboard', to: '/admin', icon: LayoutDashboard, roles: EVERYONE },
+  { label: 'Posts', to: '/admin/posts', icon: FileText, roles: STAFF },
+  { label: 'Categories', to: '/admin/categories', icon: FolderTree, roles: [ROLES.ADMIN] },
+  { label: 'Tags', to: '/admin/tags', icon: Tags, roles: [ROLES.ADMIN] },
+  { label: 'Comments', to: '/admin/comments', icon: MessagesSquare, roles: [ROLES.ADMIN, ROLES.EDITOR] },
+  { label: 'Media', to: '/admin/media', icon: Image, roles: STAFF },
+  { label: 'Users', to: '/admin/users', icon: Users, roles: [ROLES.ADMIN] },
+  { label: 'Analytics', to: '/admin/analytics', icon: BarChart3, roles: [ROLES.ADMIN, ROLES.EDITOR] },
 ]
 
 export function navItemsForRole(role: Role): NavItem[] {

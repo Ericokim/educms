@@ -21,7 +21,7 @@ export function LoginPage() {
   const { login, isAuthenticated, isLoading } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const redirectTo = (location.state as { from?: string } | null)?.from ?? '/'
+  const redirectTo = (location.state as { from?: string } | null)?.from ?? '/admin'
 
   const {
     register,

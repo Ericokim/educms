@@ -121,13 +121,13 @@ export function DashboardPage() {
         {heading}
         <div className="flex gap-2">
           <Button asChild>
-            <Link to="/posts">
+            <Link to="/admin/posts/new">
               <PlusCircle aria-hidden="true" /> New post
             </Link>
           </Button>
           {(isAdmin || user.role === ROLES.EDITOR) && (
             <Button asChild variant="outline">
-              <Link to="/comments">Review comments</Link>
+              <Link to="/admin/comments">Review comments</Link>
             </Button>
           )}
         </div>

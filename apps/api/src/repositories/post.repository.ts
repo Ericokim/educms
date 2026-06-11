@@ -22,6 +22,7 @@ interface PostRow {
   category_id: number | null
   category_name: string | null
   featured_image_id: number | null
+  featured_image_path: string | null
   meta_title: string | null
   meta_description: string | null
   meta_keywords: string | null
@@ -34,7 +35,7 @@ interface PostRow {
 }
 
 const POST_SELECT = `
-  SELECT p.*, u.username AS author, c.name AS category_name,
+  SELECT p.*, u.username AS author, c.name AS category_name, fm.path AS featured_image_path,
          coalesce(
            json_agg(json_build_object('id', t.id, 'name', t.name, 'slug', t.slug)
                     ORDER BY t.name)
@@ -43,10 +44,11 @@ const POST_SELECT = `
   FROM posts p
   JOIN users u ON u.id = p.author_id
   LEFT JOIN categories c ON c.id = p.category_id
+  LEFT JOIN media fm ON fm.id = p.featured_image_id
   LEFT JOIN post_tags pt ON pt.post_id = p.id
   LEFT JOIN tags t ON t.id = pt.tag_id`
 
-const POST_GROUP_BY = 'GROUP BY p.id, u.username, c.name'
+const POST_GROUP_BY = 'GROUP BY p.id, u.username, c.name, fm.path'
 
 function toListItem(row: PostRow): PostListItem {
   return {
@@ -75,6 +77,7 @@ function toDetail(row: PostRow): PostDetail {
     metaDescription: row.meta_description,
     metaKeywords: row.meta_keywords,
     featuredImageId: row.featured_image_id,
+    featuredImageUrl: row.featured_image_path,
   }
 }
 

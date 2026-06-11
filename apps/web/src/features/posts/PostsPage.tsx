@@ -96,7 +96,7 @@ export function PostsPage() {
           </p>
         </div>
         <Button asChild>
-          <Link to="/posts/new">
+          <Link to="/admin/posts/new">
             <PlusCircle aria-hidden="true" /> New post
           </Link>
         </Button>
@@ -170,7 +170,7 @@ export function PostsPage() {
           }
         >
           <Button asChild variant="outline" size="sm">
-            <Link to="/posts/new">New post</Link>
+            <Link to="/admin/posts/new">New post</Link>
           </Button>
         </EmptyState>
       ) : (
@@ -194,7 +194,7 @@ export function PostsPage() {
                   <TableRow
                     key={post.id}
                     className="cursor-pointer"
-                    onClick={() => navigate(`/posts/${post.id}/edit`)}
+                    onClick={() => navigate(`/admin/posts/${post.id}/edit`)}
                   >
                     <TableCell>
                       <p className="font-medium">{post.title}</p>
@@ -224,7 +224,7 @@ export function PostsPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onSelect={() => navigate(`/posts/${post.id}/edit`)}>
+                          <DropdownMenuItem onSelect={() => navigate(`/admin/posts/${post.id}/edit`)}>
                             Edit
                           </DropdownMenuItem>
                           {canModerate && post.status !== 'published' && (

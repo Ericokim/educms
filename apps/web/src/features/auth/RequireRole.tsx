@@ -20,7 +20,7 @@ export function RequireRole({
           You don’t have permission to view this page.
         </p>
         <Button asChild variant="outline">
-          <Link to="/">Back to dashboard</Link>
+          <Link to="/admin">Back to dashboard</Link>
         </Button>
       </div>
     )

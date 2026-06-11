@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Eye } from 'lucide-react'
 import { Controller, useForm, type Resolver } from 'react-hook-form'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ROLES, postFormSchema, type PostDetail, type PostFormValues } from '@educms/shared'
@@ -112,7 +112,7 @@ export function PostEditorPage() {
       await updateMutation.mutateAsync(values)
     } else {
       const created = await createMutation.mutateAsync(values)
-      navigate(`/posts/${created.id}/edit`, { replace: true })
+      navigate(`/admin/posts/${created.id}/edit`, { replace: true })
     }
   }
 
@@ -134,7 +134,7 @@ export function PostEditorPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Button asChild type="button" variant="ghost" size="icon" aria-label="Back to posts">
-            <Link to="/posts">
+            <Link to="/admin/posts">
               <ArrowLeft />
             </Link>
           </Button>
@@ -151,6 +151,18 @@ export function PostEditorPage() {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {isEdit && postId !== undefined && (
+            <Button
+              asChild
+              type="button"
+              variant="outline"
+              title={isDirty ? 'Unsaved changes won’t appear in the preview' : undefined}
+            >
+              <Link to={`/admin/posts/${postId}/preview`}>
+                <Eye aria-hidden="true" /> Preview
+              </Link>
+            </Button>
+          )}
           {isEdit && postId !== undefined && <VersionHistoryDialog postId={postId} />}
           {isEdit && postId !== undefined && canModerate && post.data?.status !== 'published' && (
             <Button
@@ -371,7 +383,7 @@ export function PostEditorPage() {
         destructive
         onConfirm={() => {
           if (postId !== undefined) {
-            deleteMutation.mutate(postId, { onSuccess: () => navigate('/posts') })
+            deleteMutation.mutate(postId, { onSuccess: () => navigate('/admin/posts') })
           }
           setShowDelete(false)
         }}

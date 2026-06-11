@@ -1,10 +1,12 @@
 import { lazy } from 'react'
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { ROLES, STAFF_ROLES } from '@educms/shared'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
 import { RequireRole } from '@/features/auth/RequireRole'
 import { DashboardPage } from '@/features/dashboard/DashboardPage'
+import { PublicLayout } from '@/features/public/components/PublicLayout'
+import { HomePage } from '@/features/public/pages/HomePage'
 import { AppLayout } from './layout/AppLayout'
 
 // Heavy feature pages are split into their own chunks; the post editor
@@ -15,7 +17,10 @@ const PostsPage = lazy(() =>
 const PostEditorPage = lazy(() =>
   import('@/features/posts/PostEditorPage').then((m) => ({ default: m.PostEditorPage }))
 )
-const CategoriesPage = lazy(() =>
+const PostPreviewPage = lazy(() =>
+  import('@/features/posts/PostPreviewPage').then((m) => ({ default: m.PostPreviewPage }))
+)
+const CategoriesAdminPage = lazy(() =>
   import('@/features/taxonomy/CategoriesPage').then((m) => ({ default: m.CategoriesPage }))
 )
 const TagsPage = lazy(() =>
@@ -34,17 +39,58 @@ const AnalyticsPage = lazy(() =>
   import('@/features/analytics/AnalyticsPage').then((m) => ({ default: m.AnalyticsPage }))
 )
 
+// Public reading experience.
+const ArticlesPage = lazy(() =>
+  import('@/features/public/pages/ArticlesPage').then((m) => ({ default: m.ArticlesPage }))
+)
+const ArticleDetailPage = lazy(() =>
+  import('@/features/public/pages/ArticleDetailPage').then((m) => ({
+    default: m.ArticleDetailPage,
+  }))
+)
+const PublicCategoriesPage = lazy(() =>
+  import('@/features/public/pages/CategoriesPage').then((m) => ({
+    default: m.CategoriesPage,
+  }))
+)
+const CategoryDetailPage = lazy(() =>
+  import('@/features/public/pages/CategoryDetailPage').then((m) => ({
+    default: m.CategoryDetailPage,
+  }))
+)
+const TagDetailPage = lazy(() =>
+  import('@/features/public/pages/TagDetailPage').then((m) => ({
+    default: m.TagDetailPage,
+  }))
+)
+const SearchPage = lazy(() =>
+  import('@/features/public/pages/SearchPage').then((m) => ({ default: m.SearchPage }))
+)
+
 export const router = createBrowserRouter([
+  {
+    element: <PublicLayout />,
+    children: [
+      { path: '/', element: <HomePage /> },
+      { path: '/articles', element: <ArticlesPage /> },
+      { path: '/articles/:slug', element: <ArticleDetailPage /> },
+      { path: '/categories', element: <PublicCategoriesPage /> },
+      { path: '/categories/:slug', element: <CategoryDetailPage /> },
+      { path: '/tags/:slug', element: <TagDetailPage /> },
+      { path: '/search', element: <SearchPage /> },
+    ],
+  },
   { path: '/login', element: <LoginPage /> },
   {
+    path: '/admin',
     element: <ProtectedRoute />,
     children: [
       {
         element: <AppLayout />,
         children: [
-          { path: '/', element: <DashboardPage /> },
+          { index: true, element: <DashboardPage /> },
           {
-            path: '/posts',
+            path: 'posts',
             element: (
               <RequireRole roles={STAFF_ROLES}>
                 <PostsPage />
@@ -52,7 +98,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: '/posts/new',
+            path: 'posts/new',
             element: (
               <RequireRole roles={STAFF_ROLES}>
                 <PostEditorPage />
@@ -60,7 +106,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: '/posts/:id/edit',
+            path: 'posts/:id/edit',
             element: (
               <RequireRole roles={STAFF_ROLES}>
                 <PostEditorPage />
@@ -68,15 +114,23 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: '/categories',
+            path: 'posts/:id/preview',
+            element: (
+              <RequireRole roles={STAFF_ROLES}>
+                <PostPreviewPage />
+              </RequireRole>
+            ),
+          },
+          {
+            path: 'categories',
             element: (
               <RequireRole roles={[ROLES.ADMIN]}>
-                <CategoriesPage />
+                <CategoriesAdminPage />
               </RequireRole>
             ),
           },
           {
-            path: '/tags',
+            path: 'tags',
             element: (
               <RequireRole roles={[ROLES.ADMIN]}>
                 <TagsPage />
@@ -84,7 +138,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: '/comments',
+            path: 'comments',
             element: (
               <RequireRole roles={[ROLES.ADMIN, ROLES.EDITOR]}>
                 <CommentsPage />
@@ -92,7 +146,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: '/media',
+            path: 'media',
             element: (
               <RequireRole roles={STAFF_ROLES}>
                 <MediaPage />
@@ -100,7 +154,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: '/users',
+            path: 'users',
             element: (
               <RequireRole roles={[ROLES.ADMIN]}>
                 <UsersPage />
@@ -108,7 +162,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: '/analytics',
+            path: 'analytics',
             element: (
               <RequireRole roles={[ROLES.ADMIN, ROLES.EDITOR]}>
                 <AnalyticsPage />
@@ -119,4 +173,5 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  { path: '*', element: <Navigate to="/" replace /> },
 ])

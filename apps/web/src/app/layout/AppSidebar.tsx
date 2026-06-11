@@ -45,7 +45,7 @@ export function AppSidebar() {
                     isActive={location.pathname === item.to}
                     tooltip={item.label}
                   >
-                    <NavLink to={item.to} end={item.to === '/'}>
+                    <NavLink to={item.to} end={item.to === '/admin'}>
                       <item.icon aria-hidden="true" />
                       <span>{item.label}</span>
                     </NavLink>

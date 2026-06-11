@@ -35,6 +35,7 @@ export interface PostDetail extends PostListItem {
   metaDescription: string | null
   metaKeywords: string | null
   featuredImageId: number | null
+  featuredImageUrl: string | null
 }
 
 export interface PostVersionSummary {
