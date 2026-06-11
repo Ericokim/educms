@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { analyticsRoutes } from './analytics.routes.js'
 import { authRoutes } from './auth.routes.js'
 import { commentRoutes } from './comment.routes.js'
+import { docsRoutes } from './docs.routes.js'
 import { healthRoutes } from './health.routes.js'
 import { mediaRoutes } from './media.routes.js'
 import { postRoutes } from './post.routes.js'
@@ -21,4 +22,4 @@ apiRoutes.use('/comments', commentRoutes)
 apiRoutes.use('/media', mediaRoutes)
 apiRoutes.use('/users', userRoutes)
 apiRoutes.use('/public', publicRoutes)
-// apiRoutes.use('/analytics', analyticsRoutes)
+apiRoutes.use(docsRoutes) // /api/docs + /api/openapi.json

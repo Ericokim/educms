@@ -131,6 +131,19 @@ npm run qa:browser          # 17-step browser walkthrough incl. the full publish
 
 CI (`.github/workflows/ci.yml`) runs lint, build, migrations, and both test suites against a Postgres service container on every push.
 
+## API Documentation and Testing
+
+Interactive API documentation (powered by Scalar) ships with the API itself:
+
+| | URL |
+| --- | --- |
+| Live API docs | https://educms-api.onrender.com/api/docs |
+| Live OpenAPI JSON | https://educms-api.onrender.com/api/openapi.json |
+| Local API docs | http://localhost:4000/api/docs |
+| Local OpenAPI JSON | http://localhost:4000/api/openapi.json |
+
+**Testing authenticated requests:** open the docs, run `POST /auth/login` with a demo account, copy `data.token` from the response, paste it as the Bearer token in the Authentication panel, then run protected endpoints like `GET /auth/me` or `GET /users`. Public endpoints (`GET /public/posts`, `GET /public/search?q=python`, …) work without a token. Set `SCALAR_ENABLED=false` to disable the docs.
+
 ## API Response Format
 
 All API responses use a consistent envelope:
