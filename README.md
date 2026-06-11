@@ -74,7 +74,11 @@ Seed users: `admin@educms.local`, `editor@…`, `author@…`, `author2@…`, `su
 
 ## Running the App
 
-In two terminals:
+```bash
+npm run dev            # API (:4000) + admin panel (:5173) together
+```
+
+Or individually in two terminals:
 
 ```bash
 npm run dev:api        # API on http://localhost:4000
