@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight, MoreHorizontal, UserPlus, Users } from 'lucide-react'
 import { ALL_ROLES, type Role, type User } from '@educms/shared'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -170,13 +171,27 @@ export function UsersPage() {
                   return (
                     <TableRow key={user.id} className={!user.isActive ? 'opacity-60' : ''}>
                       <TableCell>
-                        <p className="font-medium">
-                          {user.username}
-                          {isSelf && (
-                            <span className="ml-1 text-xs text-muted-foreground">(you)</span>
-                          )}
-                        </p>
-                        <p className="text-xs text-muted-foreground">{displayName}</p>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="size-8">
+                            <AvatarFallback className="text-xs">
+                              {(displayName !== '—' ? displayName : user.username)
+                                .split(' ')
+                                .map((part) => part[0])
+                                .slice(0, 2)
+                                .join('')
+                                .toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium">
+                              {user.username}
+                              {isSelf && (
+                                <span className="ml-1 text-xs text-muted-foreground">(you)</span>
+                              )}
+                            </p>
+                            <p className="text-xs text-muted-foreground">{displayName}</p>
+                          </div>
+                        </div>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">{user.email}</TableCell>
                       <TableCell>

@@ -1,3 +1,4 @@
+import { ShieldAlert } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { Role } from '@educms/shared'
 import { Button } from '@/components/ui/button'
@@ -15,13 +16,27 @@ export function RequireRole({
   if (!user || !roles.includes(user.role)) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
-        <h1 className="text-2xl font-semibold">Access denied</h1>
-        <p className="text-muted-foreground">
-          You don’t have permission to view this page.
+        <div className="flex size-14 items-center justify-center rounded-full bg-muted">
+          <ShieldAlert className="size-7 text-muted-foreground" aria-hidden="true" />
+        </div>
+        <h1 className="text-2xl font-semibold tracking-tight">Access denied</h1>
+        <p className="max-w-md text-muted-foreground">
+          Your current role{user ? (
+            <>
+              , <span className="font-medium capitalize text-foreground">{user.role}</span>,
+            </>
+          ) : null}{' '}
+          does not allow access to this admin section. You can return to your dashboard or
+          browse published content.
         </p>
-        <Button asChild variant="outline">
-          <Link to="/admin">Back to dashboard</Link>
-        </Button>
+        <div className="flex flex-wrap justify-center gap-2">
+          <Button asChild>
+            <Link to="/admin">Back to dashboard</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link to="/">Browse public site</Link>
+          </Button>
+        </div>
       </div>
     )
   }

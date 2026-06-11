@@ -1,3 +1,4 @@
+import { Eye, FileText, MessagesSquare, Users as UsersIcon } from 'lucide-react'
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -19,6 +20,8 @@ import { EmptyState } from '@/components/shared/EmptyState'
 import { ErrorState } from '@/components/shared/ErrorState'
 import { RoleBadge } from '@/components/shared/RoleBadge'
 import { StatusBadge } from '@/components/shared/StatusBadge'
+import { StatCard } from '@/components/shared/StatCard'
+import { useDashboard } from '@/features/dashboard/useDashboard'
 import { usePostAnalytics, useUserAnalytics } from './hooks'
 
 const monthChartConfig = {
@@ -49,6 +52,7 @@ function AnalyticsSkeleton() {
 export function AnalyticsPage() {
   const posts = usePostAnalytics()
   const users = useUserAnalytics()
+  const summary = useDashboard()
 
   const isPending = posts.isPending || users.isPending
   const isError = posts.isError || users.isError
@@ -71,7 +75,32 @@ export function AnalyticsPage() {
           }}
         />
       ) : (
-        <div className="grid items-start gap-4 lg:grid-cols-2">
+        <div className="space-y-4">
+          {summary.data && (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <StatCard
+                label="Total views"
+                value={summary.data.stats.totalViews.toLocaleString()}
+                icon={Eye}
+              />
+              <StatCard
+                label="Published posts"
+                value={summary.data.stats.publishedPosts}
+                icon={FileText}
+              />
+              <StatCard
+                label="Pending comments"
+                value={summary.data.stats.pendingComments}
+                icon={MessagesSquare}
+              />
+              <StatCard
+                label="Active users"
+                value={summary.data.stats.activeUsers}
+                icon={UsersIcon}
+              />
+            </div>
+          )}
+          <div className="grid items-start gap-4 lg:grid-cols-2">
           <Card>
             <CardHeader>
               <CardTitle>Posts per month</CardTitle>
@@ -239,6 +268,7 @@ export function AnalyticsPage() {
                 </CardContent>
               </Card>
             </div>
+          </div>
           </div>
         </div>
       )}

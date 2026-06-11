@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight, FileText, MoreHorizontal, PlusCircle } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Eye, ExternalLink, FileText, MoreHorizontal, PlusCircle, Search, X } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ROLES } from '@educms/shared'
 import type { PostListItem } from '@educms/shared'
@@ -103,16 +103,22 @@ export function PostsPage() {
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <Input
-          placeholder="Search by title…"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value)
-            resetToFirstPage()
-          }}
-          className="w-full sm:w-64"
-          aria-label="Search posts"
-        />
+        <div className="relative w-full sm:w-64">
+          <Search
+            className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden="true"
+          />
+          <Input
+            placeholder="Search by title…"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              resetToFirstPage()
+            }}
+            className="pl-9"
+            aria-label="Search posts"
+          />
+        </div>
         <Select
           value={status}
           onValueChange={(value) => {
@@ -149,6 +155,20 @@ export function PostsPage() {
             ))}
           </SelectContent>
         </Select>
+        {(search || status !== 'all' || categoryId !== 'all') && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setSearch('')
+              setStatus('all')
+              setCategoryId('all')
+              resetToFirstPage()
+            }}
+          >
+            <X aria-hidden="true" /> Reset filters
+          </Button>
+        )}
       </div>
 
       {posts.isPending ? (
@@ -183,6 +203,7 @@ export function PostsPage() {
                   <TableHead className="hidden md:table-cell">Author</TableHead>
                   <TableHead className="hidden lg:table-cell">Category</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead className="hidden xl:table-cell text-right">Views</TableHead>
                   <TableHead className="hidden sm:table-cell">Updated</TableHead>
                   <TableHead className="w-12">
                     <span className="sr-only">Actions</span>
@@ -213,6 +234,9 @@ export function PostsPage() {
                     <TableCell>
                       <StatusBadge status={post.status} />
                     </TableCell>
+                    <TableCell className="hidden xl:table-cell text-right tabular-nums text-muted-foreground">
+                      {post.viewCount.toLocaleString()}
+                    </TableCell>
                     <TableCell className="hidden sm:table-cell text-muted-foreground">
                       {formatDate(post.updatedAt)}
                     </TableCell>
@@ -227,6 +251,22 @@ export function PostsPage() {
                           <DropdownMenuItem onSelect={() => navigate(`/admin/posts/${post.id}/edit`)}>
                             Edit
                           </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onSelect={() => navigate(`/admin/posts/${post.id}/preview`)}
+                          >
+                            <Eye aria-hidden="true" /> Preview
+                          </DropdownMenuItem>
+                          {post.status === 'published' && (
+                            <DropdownMenuItem asChild>
+                              <a
+                                href={`/articles/${post.slug}`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                <ExternalLink aria-hidden="true" /> View public page
+                              </a>
+                            </DropdownMenuItem>
+                          )}
                           {canModerate && post.status !== 'published' && (
                             <DropdownMenuItem onSelect={() => publishMutation.mutate(post.id)}>
                               Publish

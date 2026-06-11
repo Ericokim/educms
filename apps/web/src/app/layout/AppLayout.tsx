@@ -20,7 +20,7 @@ export function AppLayout() {
       <AppSidebar />
       <SidebarInset>
         <AppHeader />
-        <main className="flex-1 p-4 md:p-6">
+        <main className="mx-auto w-full max-w-7xl flex-1 p-4 md:p-6">
           <Suspense fallback={<PageFallback />}>
             <Outlet />
           </Suspense>
