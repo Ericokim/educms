@@ -2,7 +2,9 @@
 
 EduCMS is an educational Content Management System for institutions to manage posts, categories, tags, comments, media, users, SEO metadata, and analytics through a role-based admin panel.
 
-**Features:** JWT auth with four roles (admin/editor/author/subscriber) · posts with rich text, SEO fields, versioning and rollback · publish/archive workflow · categories & tags · comment moderation · media library with validated uploads · user management with instant deactivation · dashboard & analytics with charts · 95 automated tests + browser QA suite.
+**Features:** a public content website (homepage, articles, categories, tags, search, comments) backed by a role-based admin panel · JWT auth with four roles (admin/editor/author/subscriber) · posts with rich text, SEO fields, versioning and rollback · draft → preview → publish workflow · comment moderation · media library with validated uploads · user management with instant deactivation · dashboard & analytics with charts · 106 automated tests + an end-to-end browser QA suite.
+
+**Two faces, one app:** the public site lives at `/` (only published content, ever), the admin CMS at `/admin`. Editors preview drafts through the exact public article layout before publishing.
 
 ## Tech Stack
 
@@ -106,9 +108,9 @@ Per workspace (`-w apps/web`, `-w apps/api`, `-w packages/shared`): `lint`, `bui
 ## Testing
 
 ```bash
-npm run test -w apps/api    # 73 integration tests (needs migrated + seeded local DB)
+npm run test -w apps/api    # 84 integration tests (needs migrated + seeded local DB)
 npm run test -w apps/web    # 22 component tests
-npm run qa:browser          # 10-step browser walkthrough with screenshots
+npm run qa:browser          # 17-step browser walkthrough incl. the full publishing lifecycle
 ```
 
 CI (`.github/workflows/ci.yml`) runs lint, build, migrations, and both test suites against a Postgres service container on every push.
@@ -128,6 +130,8 @@ All API responses use a consistent envelope:
 ## Architecture
 
 Layered API: routes (auth, role, rate-limit, and validation middleware) → controllers (HTTP only) → services (business logic, ownership checks, activity logging) → repositories (parameterized SQL). The frontend uses feature folders, each with typed API service functions and TanStack Query hooks; forms validate with the same Zod schemas the API uses, shared through `@educms/shared`. Auth reloads the user from the database on every request, so deactivation and role changes take effect immediately. Every content change snapshots into a version history that supports rollback. Uploads are checked against a MIME whitelist *and* magic-byte signatures, stored under random UUID filenames.
+
+The public site is served by a dedicated `/api/public` namespace that can only ever return published content — drafts and archived posts are filtered at the SQL level, comments are approved-only, and responses carry no admin fields. Reader comments require an account and always enter the moderation queue as pending.
 
 ## Deployment
 

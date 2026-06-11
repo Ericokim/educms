@@ -1,4 +1,5 @@
-// Browser QA driver: logs into the running app and walks the main pages.
+// Browser QA driver: walks the public site, the admin panel, and the full
+// publishing lifecycle end to end.
 // Usage: node scripts/qa-browser.mjs (expects api on :4000 and web on :5173)
 import { chromium } from 'playwright-core'
 import fs from 'node:fs'
@@ -12,6 +13,7 @@ fs.mkdirSync(SHOTS, { recursive: true })
 
 const results = []
 const consoleErrors = []
+const QA_TITLE = `QA Publishing Flow ${Date.now()}`
 
 function record(step, ok, detail = '') {
   results.push({ step, ok, detail })
@@ -24,76 +26,160 @@ page.on('console', (msg) => {
   if (msg.type() === 'error') consoleErrors.push(msg.text())
 })
 
-try {
-  // 1. Login page renders
+async function login(email) {
   await page.goto('http://localhost:5173/login', { waitUntil: 'networkidle' })
-  record('login page renders', await page.getByText('Sign in to manage your content').isVisible())
-
-  // 2. Invalid login shows error
-  await page.getByLabel('Email').fill('admin@educms.local')
-  await page.getByLabel('Password').fill('wrong-password')
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await page.getByRole('alert').waitFor({ timeout: 5000 })
-  record('invalid login shows error', (await page.getByRole('alert').textContent())?.includes('Invalid'))
-
-  // 3. Valid login lands on dashboard with real stats
+  await page.getByLabel('Email').fill(email)
   await page.getByLabel('Password').fill('Password123!')
   await page.getByRole('button', { name: 'Sign in' }).click()
-  await page.getByText('Welcome back, Alice').waitFor({ timeout: 10000 })
-  await page.getByText('Published posts').waitFor()
-  record('admin login -> dashboard with stats', true)
-  await page.screenshot({ path: `${SHOTS}/01-dashboard.png`, fullPage: true })
+  await page.getByText(/Welcome back/).waitFor({ timeout: 10000 })
+}
 
-  // 4. Posts page: table renders with seed data
-  await page.getByRole('link', { name: 'Posts', exact: true }).click()
-  await page.getByRole('link', { name: 'New post', exact: true }).waitFor()
-  await page.getByText('Scholarship Applications for 2027 Now Open').waitFor({ timeout: 8000 })
-  record('posts table renders seed content', true)
-  await page.screenshot({ path: `${SHOTS}/02-posts.png`, fullPage: true })
-
-  // 5. Posts search filters
-  await page.getByLabel('Search posts').fill('python')
-  await page.getByText('Getting Started with Python for Data Analysis').waitFor({ timeout: 5000 })
-  record('post search filters results', true)
-
-  // 6. Users page renders with role badges
-  await page.getByRole('link', { name: 'Users', exact: true }).click()
-  await page.getByText('Manage accounts and roles').waitFor()
-  await page.getByText('(you)').waitFor({ timeout: 8000 })
-  record('users page renders with self marker', true)
-  await page.screenshot({ path: `${SHOTS}/03-users.png`, fullPage: true })
-
-  // 7. Comments moderation page
-  await page.getByRole('link', { name: 'Comments', exact: true }).click()
-  await page.getByText('Review and moderate reader comments').waitFor({ timeout: 8000 })
-  record('comments page renders', true)
-
-  // 8. Analytics page with charts
-  await page.getByRole('link', { name: 'Analytics', exact: true }).click()
-  await page.getByText('Posts per month').waitFor({ timeout: 8000 })
-  await page.getByText('Top content').waitFor()
-  record('analytics page renders charts', true)
-  await page.screenshot({ path: `${SHOTS}/04-analytics.png`, fullPage: true })
-
-  // 9. Logout returns to login
-  await page.getByRole('button', { name: /Alice Nguyen/ }).click()
+async function logout(name) {
+  // The user menu lives in the admin header.
+  if (!page.url().includes('/admin')) {
+    await page.goto('http://localhost:5173/admin', { waitUntil: 'networkidle' })
+  }
+  await page.getByRole('button', { name }).click()
   await page.getByRole('menuitem', { name: 'Log out' }).click()
   await page.getByText('Sign in to manage your content').waitFor({ timeout: 8000 })
-  record('logout returns to login page', true)
+}
 
-  // 10. Subscriber sees a restricted experience
-  await page.getByLabel('Email').fill('subscriber@educms.local')
-  await page.getByLabel('Password').fill('Password123!')
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await page.getByText('Welcome back, Sofia').waitFor({ timeout: 8000 })
-  const postsLinkVisible = await page
-    .getByRole('link', { name: 'Posts', exact: true })
-    .isVisible()
-    .catch(() => false)
-  record('subscriber dashboard without staff nav', !postsLinkVisible)
-  await page.screenshot({ path: `${SHOTS}/05-subscriber.png`, fullPage: true })
+try {
+  // ---------- Public site (anonymous) ----------
+  await page.goto('http://localhost:5173/', { waitUntil: 'networkidle' })
+  await page.getByText('Learn. Discover.').waitFor()
+  await page.getByText('Latest articles').waitFor()
+  record('public homepage renders', true)
+  await page.screenshot({ path: `${SHOTS}/01-public-home.png`, fullPage: true })
+
+  await page.getByRole('link', { name: 'Articles', exact: true }).first().click()
+  await page.getByRole('heading', { name: 'Articles' }).waitFor()
+  await page
+    .getByRole('link', { name: /Getting Started with Python/ })
+    .first()
+    .waitFor({ timeout: 8000 })
+  record('public articles listing renders', true)
+
+  await page
+    .getByRole('link', { name: /Getting Started with Python/ })
+    .first()
+    .click()
+  await page.getByRole('heading', { level: 1 }).waitFor()
+  await page.getByText('Related articles').waitFor({ timeout: 8000 })
+  record('public article page renders by slug', true)
+  await page.screenshot({ path: `${SHOTS}/02-public-article.png`, fullPage: true })
+
+  await page.goto('http://localhost:5173/search?q=python', { waitUntil: 'networkidle' })
+  await page.getByText(/result(s)? for/).waitFor({ timeout: 8000 })
+  record('public search returns results', true)
+
+  await page.goto('http://localhost:5173/categories/tutorials', { waitUntil: 'networkidle' })
+  await page.getByRole('heading', { name: 'Tutorials' }).waitFor({ timeout: 8000 })
+  record('public category page renders', true)
+
+  // ---------- Admin core ----------
+  await login('admin@educms.local')
+  await page.getByText('Media files').waitFor()
+  record('admin dashboard with six stat cards', true)
+  await page.screenshot({ path: `${SHOTS}/03-admin-dashboard.png`, fullPage: true })
+
+  // ---------- Publishing lifecycle ----------
+  await page.getByRole('link', { name: 'Posts', exact: true }).click()
+  await page.getByRole('link', { name: 'New post', exact: true }).click()
+  await page.getByLabel('Title', { exact: true }).fill(QA_TITLE)
+  await page.locator('.tiptap-content').click()
+  await page.keyboard.type('This article was created by the automated QA flow.')
+  await page.getByRole('button', { name: 'Create draft' }).click()
+  await page.getByRole('button', { name: 'Save changes' }).waitFor({ timeout: 8000 })
+  record('draft created', true)
+
+  const editUrl = page.url()
+  const postId = editUrl.match(/posts\/(\d+)\/edit/)?.[1]
+  const qaSlug = QA_TITLE.toLowerCase().replace(/\s+/g, '-')
+
+  // Draft must NOT be public.
+  const draftPublic = await page.request.get(
+    `http://localhost:4000/api/public/posts/${qaSlug}`
+  )
+  record('draft hidden from public API', draftPublic.status() === 404)
+
+  // Preview without publishing.
+  await page.getByRole('link', { name: 'Preview' }).click()
+  await page.getByText('Preview mode — this post is not published yet.').waitFor()
+  await page.getByRole('heading', { name: QA_TITLE }).waitFor()
+  record('preview renders public layout without publishing', true)
+  await page.screenshot({ path: `${SHOTS}/04-preview.png`, fullPage: true })
+
+  const stillHidden = await page.request.get(
+    `http://localhost:4000/api/public/posts/${qaSlug}`
+  )
+  record('preview did not publish the post', stillHidden.status() === 404)
+
+  // Publish.
+  await page.getByRole('link', { name: 'Back to editor' }).click()
+  await page.getByRole('button', { name: 'Publish' }).click()
+  await page.getByText('Post published').waitFor({ timeout: 8000 })
+  record('post published from editor', true)
+
+  // Public URL now works.
+  await page.goto(`http://localhost:5173/articles/${qaSlug}`, { waitUntil: 'networkidle' })
+  await page.getByRole('heading', { name: QA_TITLE }).waitFor({ timeout: 8000 })
+  record('published article visible at public URL', true)
+
+  await logout('Alice Nguyen')
+
+  // ---------- Subscriber: read + comment ----------
+  await login('subscriber@educms.local')
+  await page.getByText('Latest articles').waitFor()
+  record('subscriber reader dashboard renders', true)
+
+  await page.goto(`http://localhost:5173/articles/${qaSlug}`, { waitUntil: 'networkidle' })
+  await page.getByLabel('Leave a comment').fill('Great article! (QA comment)')
+  await page.getByRole('button', { name: 'Submit comment' }).click()
+  await page.getByText('Thanks! Your comment will appear once it is approved.').waitFor()
+  record('subscriber submitted a comment', true)
+
+  const publicComments = await (
+    await page.request.get(`http://localhost:4000/api/public/posts/${qaSlug}/comments`)
+  ).json()
+  record(
+    'pending comment hidden from public',
+    !publicComments.data.some((c) => c.content.includes('QA comment'))
+  )
+
+  await logout('Sofia Marin')
+
+  // ---------- Editor: moderate ----------
+  await login('editor@educms.local')
+  await page.getByRole('link', { name: 'Comments', exact: true }).click()
+  await page.getByText('Great article! (QA comment)').waitFor({ timeout: 8000 })
+  await page
+    .getByRole('button', { name: /Approve comment by subscriber/ })
+    .first()
+    .click()
+  await page.getByText('Comment approved').waitFor({ timeout: 8000 })
+  const approvedComments = await (
+    await page.request.get(`http://localhost:4000/api/public/posts/${qaSlug}/comments`)
+  ).json()
+  record(
+    'approved comment visible publicly',
+    approvedComments.data.some((c) => c.content.includes('QA comment'))
+  )
+  await logout('Edgar Reyes')
+
+  // ---------- Cleanup: admin deletes the QA post ----------
+  await login('admin@educms.local')
+  await page.goto(`http://localhost:5173/admin/posts/${postId}/edit`, {
+    waitUntil: 'networkidle',
+  })
+  await page.getByRole('button', { name: 'Delete post' }).click()
+  await page.getByRole('button', { name: 'Delete' }).click()
+  await page.getByText('Post deleted').waitFor({ timeout: 8000 })
+  const gone = await page.request.get(`http://localhost:4000/api/public/posts/${qaSlug}`)
+  record('QA post cleaned up and gone from public', gone.status() === 404)
+  await logout('Alice Nguyen')
 } catch (error) {
-  record('UNEXPECTED FAILURE', false, String(error).slice(0, 200))
+  record('UNEXPECTED FAILURE', false, String(error).slice(0, 300))
   await page.screenshot({ path: `${SHOTS}/99-failure.png`, fullPage: true }).catch(() => {})
 } finally {
   await browser.close()
