@@ -147,26 +147,27 @@ describe('tags CRUD', () => {
       .send({ name: 'Vitest Cascade Tag' })
     const cascadeTagId = created.body.data.id
 
-    const posts = await request(app).get('/api/posts?limit=1').set(auth(token))
-    const post = posts.body.data.items[0]
-    const detail = await request(app).get(`/api/posts/${post.id}`).set(auth(token))
-    await request(app)
-      .patch(`/api/posts/${post.id}`)
+    // Own post: test files run in parallel workers against the same DB, so
+    // borrowing "someone else's" post races with suites that delete theirs.
+    const post = await request(app)
+      .post('/api/posts')
       .set(auth(token))
       .send({
-        title: detail.body.data.title,
-        content: detail.body.data.content,
-        excerpt: detail.body.data.excerpt ?? '',
-        categoryId: detail.body.data.categoryId,
-        tagIds: [...detail.body.data.tags.map((t: { id: number }) => t.id), cascadeTagId],
+        title: 'Vitest Tag Cascade Post',
+        content: '<p>cascade</p>',
+        tagIds: [cascadeTagId],
       })
+    expect(post.status).toBe(201)
+    const postId = post.body.data.id
 
     await request(app).delete(`/api/tags/${cascadeTagId}`).set(auth(token))
 
-    const after = await request(app).get(`/api/posts/${post.id}`).set(auth(token))
+    const after = await request(app).get(`/api/posts/${postId}`).set(auth(token))
     expect(after.status).toBe(200)
     expect(
       after.body.data.tags.some((t: { id: number }) => t.id === cascadeTagId)
     ).toBe(false)
+
+    await request(app).delete(`/api/posts/${postId}`).set(auth(token))
   })
 })
