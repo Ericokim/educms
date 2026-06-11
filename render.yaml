@@ -34,7 +34,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: FRONTEND_URL
-        value: https://educms.vercel.app # updated after the Vercel deploy
+        value: https://educms-sandy.vercel.app
       - key: UPLOAD_DIR
         value: /tmp/educms-uploads
       - key: MAX_FILE_SIZE
