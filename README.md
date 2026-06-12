@@ -5,6 +5,7 @@ EduCMS is an educational Content Management System for institutions to manage po
 ## Live Demo
 
 - **Live app:** https://educms-sandy.vercel.app — public site at `/`, admin panel at [`/admin`](https://educms-sandy.vercel.app/admin)
+- **Live API:** https://educms-api.onrender.com — opens the interactive API docs (OpenAPI spec at [`/api/openapi.json`](https://educms-api.onrender.com/api/openapi.json))
 - **Repository:** https://github.com/Ericokim/educms
 
 **Demo accounts** (all use password `Password123!`):
